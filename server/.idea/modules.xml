@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/blog.iml" filepath="$PROJECT_DIR$/blog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/blog-business/blog-business.iml" filepath="$PROJECT_DIR$/blog-business/blog-business.iml" />
+      <module fileurl="file://$PROJECT_DIR$/blog-entity/blog-entity.iml" filepath="$PROJECT_DIR$/blog-entity/blog-entity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/blog-server/blog-server.iml" filepath="$PROJECT_DIR$/blog-server/blog-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/blog-viewmodel/blog-viewmodel.iml" filepath="$PROJECT_DIR$/blog-viewmodel/blog-viewmodel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+    </modules>
+  </component>
+</project>
