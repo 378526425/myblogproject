@@ -9,10 +9,11 @@
     <packaging>pom</packaging>
     <description>Demo project for Spring Boot</description>
     <modules>
+        <module>common</module>
         <module>blog-entity</module>
         <module>blog-viewmodel</module>
         <module>blog-business</module>
         <module>blog-server</module>
-        <module>common</module>
+
     </modules>
 </project>

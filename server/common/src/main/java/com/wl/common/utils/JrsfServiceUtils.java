@@ -1,10 +1,4 @@
-package com.wl.common.util;
-
-import com.wl.common.enummodel.JrsfEnum;
-import com.wl.common.exception.JrsfException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Random;
+package com.wl.common.utils;
 
 /**
  * @program: blog

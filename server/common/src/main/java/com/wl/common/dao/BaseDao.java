@@ -13,7 +13,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @program: blog
@@ -40,6 +42,9 @@ public class BaseDao {
 
     public <T extends BaseObject> void save(T model) {
         try {
+            model.setId(UUID.randomUUID().toString());
+            model.setCreatedTime(new Date());
+            model.setModifiedTime(new Date());
             this.entityManager.persist(model);
         } catch (Exception var3) {
             throw new JrsfException(var3);
@@ -56,6 +61,7 @@ public class BaseDao {
 
     public <T extends BaseObject> void update(T model) {
         try {
+            model.setModifiedTime(new Date());
             this.entityManager.merge(model);
         } catch (Exception var3) {
             throw new JrsfException(var3);

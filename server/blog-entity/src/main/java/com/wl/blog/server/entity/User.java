@@ -1,6 +1,7 @@
 package com.wl.blog.server.entity;
 
 import com.wl.common.entity.BaseObject;
+import com.wl.common.entity.UserBase;
 
 import javax.persistence.Entity;
 
@@ -11,8 +12,14 @@ import javax.persistence.Entity;
  * @create: 2019-07-22 17:55
  **/
 @Entity
-public class User extends BaseObject{
+public class User extends BaseObject {
     String userName;
+    String loginNumber;
+    String passWord;
+    /**
+     * @Description: 头像
+     */
+    String portrait;
 
     public String getUserName() {
         return userName;
@@ -20,5 +27,29 @@ public class User extends BaseObject{
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getLoginNumber() {
+        return loginNumber;
+    }
+
+    public void setLoginNumber(String loginNumber) {
+        this.loginNumber = loginNumber;
+    }
+
+    public String getPassWord() {
+        return passWord;
+    }
+
+    public void setPassWord(String passWord) {
+        this.passWord = passWord;
+    }
+
+    public String getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(String portrait) {
+        this.portrait = portrait;
     }
 }

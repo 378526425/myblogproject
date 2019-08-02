@@ -1,4 +1,4 @@
-package com.wl.common.util;
+package com.wl.common.utils;
 
 import org.springframework.util.StringUtils;
 
