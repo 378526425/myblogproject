@@ -4,6 +4,7 @@ import com.wl.blog.viewmodel.UserViewModel;
 import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 /**
@@ -17,7 +18,7 @@ public class UserController {
     @Autowired
     UserService userService;
     @PostMapping("register")
-    public JrsfReturn register(@RequestBody UserViewModel userViewModel,HttpServletRequest request) {
+    public JrsfReturn register(@RequestBody @Validated UserViewModel userViewModel) {
         if (StringUtils.isEmpty(userViewModel.getUserName()))
         {
             return JrsfReturn.error("没有用户名！");
@@ -37,7 +38,7 @@ public class UserController {
         return this.userService.register(userViewModel);
     }
     @PostMapping("login")
-    public JrsfReturn login(@RequestBody UserViewModel userViewModel, HttpServletRequest request)
+    public JrsfReturn login(@RequestBody @Validated UserViewModel userViewModel, HttpServletRequest request)
     {
 
         if (StringUtils.isEmpty(userViewModel.getLoginNumber()))

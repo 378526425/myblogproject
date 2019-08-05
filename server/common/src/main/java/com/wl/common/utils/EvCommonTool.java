@@ -1,7 +1,12 @@
 package com.wl.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -21,6 +26,23 @@ public class EvCommonTool {
             }
         } else {
             return "";
+        }
+    }
+    public static void responseInfo(HttpServletResponse response,JrsfReturn ret) {
+        String json = JSONObject.toJSONString(ret);
+
+        response.setContentType("application/json; charset=utf-8");
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+            out.append(json);
+            out.flush();
+        } catch (IOException e) {
+            EvLog.error(e);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
         }
     }
 }

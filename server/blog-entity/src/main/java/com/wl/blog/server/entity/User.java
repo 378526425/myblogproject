@@ -4,6 +4,7 @@ import com.wl.common.entity.BaseObject;
 import com.wl.common.entity.UserBase;
 
 import javax.persistence.Entity;
+import javax.validation.constraints.Size;
 
 /**
  * @program: blog
@@ -13,8 +14,11 @@ import javax.persistence.Entity;
  **/
 @Entity
 public class User extends BaseObject {
+    @Size(min = 2,max = 15)
     String userName;
+    @Size(min = 2,max =30 )
     String loginNumber;
+    @Size(min = 5,max =30 )
     String passWord;
     /**
      * @Description: 头像
