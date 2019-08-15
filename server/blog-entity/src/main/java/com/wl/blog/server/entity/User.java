@@ -4,6 +4,7 @@ import com.wl.common.entity.BaseObject;
 import com.wl.common.entity.UserBase;
 
 import javax.persistence.Entity;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 /**
@@ -14,11 +15,13 @@ import javax.validation.constraints.Size;
  **/
 @Entity
 public class User extends BaseObject {
-    @Size(min = 2,max = 15)
+    @Size(min = 2, max = 15)
     String userName;
-    @Size(min = 2,max =30 )
+    @Size(min = 2, max = 30)
+    @NotEmpty(message = "登录账号不可为空！")
     String loginNumber;
-    @Size(min = 5,max =30 )
+    @Size(min = 5, max = 30)
+    @NotEmpty(message = "登录密码不可为空！")
     String passWord;
     /**
      * @Description: 头像

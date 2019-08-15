@@ -52,5 +52,11 @@ public class UserController {
 
         return this.userService.login(userViewModel,request);
     }
+    @GetMapping("loginOut")
+    public JrsfReturn loginOut(HttpServletRequest request)
+    {
+        request.getSession().invalidate();
+        return JrsfReturn.ok();
+    }
 
 }

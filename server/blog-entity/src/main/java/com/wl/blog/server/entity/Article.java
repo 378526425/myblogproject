@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
  **/
 @Entity
 public class Article extends BaseObject {
-    @NotBlank(message = "name 不允许为空")
+    @NotBlank(message = "标题不允许为空")
     String title;
     String introduction;
     @Lob
@@ -21,7 +21,7 @@ public class Article extends BaseObject {
     @Column(columnDefinition="text")
     @Size(min = 30,max=10000)
     String content;//文章内容
-    String img;//封面图片
+    String img;//封面图 片
     String userId;
 
     public String getTitle() {
