@@ -3,6 +3,7 @@ import com.wl.blog.service.UserService;
 import com.wl.blog.viewmodel.UserViewModel;
 import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
  **/
 @RestController
 public class UserController {
+    @Value("${server.port}")
+    String port;
     @Autowired
     UserService userService;
     @PostMapping("register")
@@ -59,4 +62,8 @@ public class UserController {
         return JrsfReturn.ok();
     }
 
+    @GetMapping("/hi")
+    public String home(@RequestParam String name) {
+        return "hi "+name+",i am from port:" +port;
+    }
 }

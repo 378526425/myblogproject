@@ -26,18 +26,15 @@ public class ArticleController {
         return this.articleService.addArticle(articleViewModel);
     }
 
-    @CachePut( value= {"Article"},key = "#id")
     @DeleteMapping("/Article/{id}")
     public JrsfReturn deleteArticle(@PathVariable String id) {
 
         return this.articleService.deleteArticle(id);
     }
-    @CachePut( value= {"Article"},key = "#articleViewModel.id")
     @PutMapping("/Article")
     public JrsfReturn updateArticle(@RequestBody @Validated ArticleViewModel articleViewModel) {
         return this.articleService.updateArticle(articleViewModel);
     }
-    @Cacheable(value = {"Article"}, key = "#id")
     @GetMapping("/Article/{id}")
     public JrsfReturn getArticle(@PathVariable String id) {
         return this.articleService.getArticle(id);
