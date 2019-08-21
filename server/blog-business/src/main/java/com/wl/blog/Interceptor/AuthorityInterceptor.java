@@ -37,7 +37,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
             long times= redisTemplate.getExpire(token, TimeUnit.SECONDS);//剩余过期时间
             if (times>0)
             {
-                redisTemplate.expire(token,60,TimeUnit.SECONDS);//如果还没有过期则续期60秒
+                redisTemplate.expire(token,5, TimeUnit.MINUTES);//如果还没有过期则续期5分钟
             }else
             {
                 redisTemplate.delete(token);
@@ -58,7 +58,10 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         {
             RequestWrapper requestWrapper = new RequestWrapper(request);
             String body = requestWrapper.getBody();
-            id= JSON.parseObject(body, BaseObject.class).getId();
+            if (!"".equals(body))
+            {
+                id= JSON.parseObject(body, BaseObject.class).getId();
+            }
         }
         if (uri.indexOf("/") >= 0) {
             resource = uri.substring(0, uri.indexOf("/"));

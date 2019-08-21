@@ -13,11 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserFeignFallBack implements UserService {
     @Override
-    public String sayHiFromClientOne(String name) {
-        return null;
-    }
-
-    @Override
     public JrsfReturn register(UserViewModel userViewModel) {
         return null;
     }
@@ -34,27 +29,6 @@ public class UserFeignFallBack implements UserService {
 
     @Override
     public JrsfReturn loginOut() {
-        return null;
-    }
-
-
-    @Override
-    public JrsfReturn setSession() {
-        return null;
-    }
-
-    @Override
-    public JrsfReturn getSession() {
-        return null;
-    }
-
-    @Override
-    public JrsfReturn getUserByToken(String token) {
-        return null;
-    }
-
-    @Override
-    public JrsfReturn getUserByTokenAddTime(String token) {
         return null;
     }
 }

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "service-blog",fallback = UserFeignFallBack.class,configuration = FeignHystrixConcurrencyStrategy.class)
 @Component
 public interface UserService {
-    @GetMapping(value = "/hi")
-    String sayHiFromClientOne(@RequestParam(value = "name") String name);
     @PostMapping("register")
      JrsfReturn register(@RequestBody @Validated UserViewModel userViewModel) ;
     @PostMapping("login")
@@ -23,12 +21,5 @@ public interface UserService {
     JrsfReturn sso();
     @GetMapping("loginOut")
     JrsfReturn loginOut();
-    @GetMapping("setSession")
-    JrsfReturn setSession();
-    @GetMapping("getSession")
-    JrsfReturn getSession();
-    @GetMapping("/getUserByToken/{token}")
-    JrsfReturn getUserByToken(@PathVariable String token);
-    @GetMapping("/getUserByTokenAddTime/{token}")
-    JrsfReturn getUserByTokenAddTime(@PathVariable String token);
+
 }

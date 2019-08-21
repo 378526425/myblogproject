@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,6 +71,8 @@ public class ArticleService {
             articleViewModel.setImg(upLoadimg(articleViewModel));
         }
         articleViewModel.setUserId(article.getUserId());
+        articleViewModel.setCreatedTime(article.getCreatedTime());
+        articleViewModel.setModifiedTime(new Date());
         BeanUtils.copyProperties(articleViewModel, article);
         this.baseDao.update(article);
         return JrsfReturn.okData(article);

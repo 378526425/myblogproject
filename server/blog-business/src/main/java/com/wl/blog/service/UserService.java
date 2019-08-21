@@ -114,7 +114,7 @@ public class UserService {
         userInfo.setRoleList(roles);
         userInfo.setPermissionList(permissions);
         String uuid= UUID.randomUUID().toString().replace("-","");
-        redisTemplate.opsForValue().set(uuid,userInfo,60, TimeUnit.SECONDS);//存入用户到数据库，有效期为一分钟
+        redisTemplate.opsForValue().set(uuid,userInfo,5, TimeUnit.MINUTES);//存入用户到数据库，有效期为一分钟
         return JrsfReturn.okMsg(uuid);
     }
 }

@@ -3,6 +3,7 @@ package com.wl.blog.controller;
 import com.wl.blog.service.UserService;
 import com.wl.blog.utils.BlogUtil;
 import com.wl.blog.viewmodel.UserViewModel;
+import com.wl.common.exception.JrsfException;
 import com.wl.common.utils.JWTUtils;
 import com.wl.common.utils.JrsfReturn;
 import io.jsonwebtoken.Claims;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: blog
@@ -69,41 +71,15 @@ public class UserController {
 
     @GetMapping("loginOut")
     public JrsfReturn loginOut(HttpServletRequest request) {
-        request.getSession().invalidate();
-        return JrsfReturn.ok();
+        String token=request.getHeader("Authorization");
+        if (token!=null)
+        {
+            redisTemplate.expire(token,1, TimeUnit.MILLISECONDS);
+        }else
+        {
+            throw new  JrsfException("未登录！");
+        }
+        return JrsfReturn.okMsg("退出成功！");
     }
 
-    @GetMapping("/hi")
-    public String home(@RequestParam String name) {
-        return "hi " + name + ",i am from port:" + port;
-    }
-
-    @GetMapping("/setSession")
-    public JrsfReturn setSession(HttpServletRequest request) {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        String sessionId = request.getSession().getId();
-        Map map = new HashMap();
-        map.put("name", "wl");
-        map.put("age", "18");
-        map.put("sessionId", sessionId);
-        request.getSession().setAttribute("sessionId", map);
-        return JrsfReturn.okData(map);
-    }
-
-    @GetMapping("/getSession")
-    public JrsfReturn getSession(HttpServletRequest request) {
-        String sessionId = request.getSession().getId();
-        return JrsfReturn.okData(request.getSession().getAttribute("sessionId"));
-    }
-
-    @GetMapping("/getUserByToken/{token}")
-    public JrsfReturn getUserByToken(@PathVariable String token) {
-        return JrsfReturn.okData(redisTemplate.opsForValue().get(token));
-    }
-
-    @GetMapping("/getUserByTokenAddTime/{token}")
-    public JrsfReturn getUserByTokenAddTime(@PathVariable String token) {
-        Claims claims = JWTUtils.parseJwtTokenAddTime(token);
-        return JrsfReturn.okData(claims.get("user"));
-    }
 }
