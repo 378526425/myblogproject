@@ -4,8 +4,6 @@ import com.wl.blog.service.ArticleService;
 import com.wl.blog.viewmodel.ArticleViewModel;
 import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

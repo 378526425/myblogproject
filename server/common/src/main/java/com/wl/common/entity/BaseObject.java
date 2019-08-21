@@ -1,6 +1,7 @@
 package com.wl.common.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
 @Inheritance(
         strategy = InheritanceType.TABLE_PER_CLASS
 )
-public class BaseObject {
+public class BaseObject{
     @Id
     @Column(
             length = 36

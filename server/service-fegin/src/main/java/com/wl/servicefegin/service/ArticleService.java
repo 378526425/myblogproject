@@ -2,6 +2,8 @@ package com.wl.servicefegin.service;
 
 import com.wl.blog.viewmodel.ArticleViewModel;
 import com.wl.common.utils.JrsfReturn;
+import com.wl.servicefegin.fallback.ArticleFeignFallBack;
+import com.wl.servicefegin.interceptor.FeignHystrixConcurrencyStrategy;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * @author: WangLei
  * @create: 2019-08-15 16:05
  **/
-@FeignClient(value = "service-blog")
+@FeignClient(value = "service-blog",fallback = ArticleFeignFallBack.class,configuration = FeignHystrixConcurrencyStrategy.class)
 @Component
 public interface ArticleService {
     @PostMapping("/Article")

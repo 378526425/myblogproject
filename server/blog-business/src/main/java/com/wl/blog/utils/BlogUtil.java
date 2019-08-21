@@ -1,13 +1,15 @@
 package com.wl.blog.utils;
 
-import com.wl.blog.server.entity.User;
 import com.wl.blog.viewmodel.UserViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Map;
 
@@ -17,16 +19,27 @@ import java.util.Map;
  * @author: WangLei
  * @create: 2019-08-05 16:06
  **/
+@Component
 public class BlogUtil {
-
-    public static UserViewModel getLoginUser()
-    {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return (UserViewModel) servletRequestAttributes.getRequest().getSession().getAttribute("user");
+    @Autowired
+    private RedisTemplate redisTemplate;
+    static BlogUtil blogUtil;
+    @PostConstruct
+    public void init() {
+        blogUtil = this;
+        blogUtil.redisTemplate = this.redisTemplate;
     }
-    public static boolean conditionParamCheck(Map<String,Object> paramMap,String key)
-    {
-        return paramMap!=null&& paramMap.get(key)!=null&&!StringUtils.isEmpty(paramMap.get(key).toString());
+
+    public static UserViewModel getLoginUser() {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        String token = request.getHeader("Authorization");
+        UserViewModel userViewModel = (UserViewModel) blogUtil.redisTemplate.opsForValue().get(token);
+        return userViewModel;
+    }
+
+    public static boolean conditionParamCheck(Map<String, Object> paramMap, String key) {
+        return paramMap != null && paramMap.get(key) != null && !StringUtils.isEmpty(paramMap.get(key).toString());
     }
 
     /**

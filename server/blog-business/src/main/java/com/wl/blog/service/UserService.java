@@ -17,13 +17,14 @@ import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +37,10 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     BaseDao dao;
+    @Autowired
+    StringRedisTemplate StringredisTemplate;
+    @Autowired
+    RedisTemplate redisTemplate;
     @Value("${defaultrole}")
     private  String defaultrole;
     @Transactional
@@ -61,7 +66,7 @@ public class UserService {
         return JrsfReturn.okData(user);
     }
 
-    public JrsfReturn login(UserViewModel userViewModel, HttpServletRequest request) {
+    public JrsfReturn login(UserViewModel userViewModel) {
         QUser qUser = QUser.user;
         QRole qRole = QRole.role;
         QPermission qPermission = QPermission.permission;
@@ -108,7 +113,8 @@ public class UserService {
         List<Permission> permissions = userInfo.getPermissionList().stream().distinct().collect(Collectors.toList());
         userInfo.setRoleList(roles);
         userInfo.setPermissionList(permissions);
-        request.getSession().setAttribute("user", userInfo);
-        return JrsfReturn.okMsg("登录成功！");
+        String uuid= UUID.randomUUID().toString().replace("-","");
+        redisTemplate.opsForValue().set(uuid,userInfo,60, TimeUnit.SECONDS);//存入用户到数据库，有效期为一分钟
+        return JrsfReturn.okMsg(uuid);
     }
 }

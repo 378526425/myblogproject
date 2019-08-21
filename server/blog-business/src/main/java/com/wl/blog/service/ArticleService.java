@@ -12,7 +12,6 @@ import com.wl.blog.viewmodel.ArticleViewModel;
 import com.wl.blog.viewmodel.UserViewModel;
 import com.wl.common.dao.BaseDao;
 import com.wl.common.entity.ResultSet;
-import com.wl.common.utils.EvCommonTool;
 import com.wl.common.utils.FileUtil;
 import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.BeanUtils;

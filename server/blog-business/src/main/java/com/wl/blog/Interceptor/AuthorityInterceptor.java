@@ -11,11 +11,12 @@ import com.wl.common.entity.BaseObject;
 import com.wl.common.enummodel.AccessType;
 import com.wl.common.utils.EvCommonTool;
 import com.wl.common.utils.JrsfReturn;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: server
@@ -26,8 +27,23 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthorityInterceptor implements HandlerInterceptor {
     @Autowired
     BaseDao baseDao;
+    @Autowired
+    RedisTemplate redisTemplate;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String token=request.getHeader("Authorization");
+        if (token!=null)
+        {
+            long times= redisTemplate.getExpire(token, TimeUnit.SECONDS);//剩余过期时间
+            if (times>0)
+            {
+                redisTemplate.expire(token,60,TimeUnit.SECONDS);//如果还没有过期则续期60秒
+            }else
+            {
+                redisTemplate.delete(token);
+            }
+        }
+
         String method = request.getMethod();
         String uri = request.getRequestURI();
         if (uri.startsWith("/api/")) {

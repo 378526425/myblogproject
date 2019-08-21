@@ -24,18 +24,42 @@ public class UserController {
     public String home(@RequestParam String name) {
         return this.userService.sayHiFromClientOne(name);
     }
+
     @PostMapping("register")
     public JrsfReturn register(@RequestBody @Validated UserViewModel userViewModel) {
         return this.userService.register(userViewModel);
     }
+
     @PostMapping("login")
-    public JrsfReturn login(@RequestBody @Validated UserViewModel userViewModel)
-    {
+    public JrsfReturn login(@RequestBody @Validated UserViewModel userViewModel) {
         return this.userService.login(userViewModel);
     }
+
+    @GetMapping("sso")
+    public JrsfReturn sso() {
+        return this.userService.sso();
+    }
+
     @GetMapping("loginOut")
-    public JrsfReturn loginOut(HttpServletRequest request)
-    {
-        return this.userService.loginOut(request);
+    public JrsfReturn loginOut() {
+        return this.userService.loginOut();
+    }
+
+    @GetMapping("setSession")
+    public JrsfReturn setSession() {
+        return this.userService.setSession();
+    }
+
+    @GetMapping("getSession")
+    public JrsfReturn getSession() {
+        return this.userService.getSession();
+    }
+    @GetMapping("/getUserByToken/{token}")
+    public JrsfReturn getUserByToken(@PathVariable String token) {
+        return this.userService.getUserByToken(token);
+    }
+    @GetMapping("/getUserByTokenAddTime/{token}")
+    public JrsfReturn getUserByTokenAddTime(@PathVariable String token) {
+        return this.userService.getUserByTokenAddTime(token);
     }
 }

@@ -7,6 +7,7 @@ import com.wl.blog.server.entity.User;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
  * @author: WangLei
  * @create: 2019-07-22 17:58
  **/
-public class UserViewModel extends User {
+public class UserViewModel extends User implements Serializable {
     @Size(min = 2, max = 30)
     String truePassword;
     List<Role> roleList;

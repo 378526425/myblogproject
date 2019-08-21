@@ -2,13 +2,16 @@ package com.wl.blog.viewmodel;
 
 import com.wl.blog.server.entity.Article;
 
+import java.io.Serializable;
+
+
 /**
  * @program: server
  * @description: 文章
  * @author: WangLei
  * @create: 2019-08-05 15:43
  **/
-public class ArticleViewModel extends Article {
+public class ArticleViewModel extends Article implements Serializable {
     String base64;
     String imgName;
     UserViewModel userViewModel;
