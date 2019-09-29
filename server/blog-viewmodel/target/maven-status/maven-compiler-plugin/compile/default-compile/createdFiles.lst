@@ -1,2 +1,7 @@
-com\wl\blog\viewmodel\ArticleViewModel.class
+com\wl\blog\viewmodel\CommentMessageViewModel.class
+com\wl\blog\viewmodel\IgnoreResourceViewModel.class
+com\wl\blog\viewmodel\RoleViewModel.class
+com\wl\blog\viewmodel\ArticleCommentViewModel.class
 com\wl\blog\viewmodel\UserViewModel.class
+com\wl\blog\viewmodel\PermissionViewModel.class
+com\wl\blog\viewmodel\ArticleViewModel.class

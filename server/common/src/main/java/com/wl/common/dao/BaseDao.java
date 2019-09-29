@@ -91,11 +91,7 @@ public class BaseDao {
     }
 
     public <T extends BaseObject> List<T> getObjects(Class<T> clazz) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        CriteriaQuery<T> cq = cb.createQuery(clazz);
-        Root<T> root = cq.from(clazz);
-        cq.select(root);
-        Query q = this.entityManager.createQuery(cq);
+        Query q = createQuery(clazz);
         List<T> result = q.getResultList();
         return result;
     }

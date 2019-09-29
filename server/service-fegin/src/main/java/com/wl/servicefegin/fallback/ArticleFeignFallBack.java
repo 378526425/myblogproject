@@ -37,4 +37,14 @@ public class ArticleFeignFallBack implements ArticleService {
     public JrsfReturn getPageArticle(String condition, int pageIndex, int pageSize) {
         return null;
     }
+
+    @Override
+    public JrsfReturn likeArticle(String id) {
+        return null;
+    }
+
+    @Override
+    public JrsfReturn disLikeArticle(String id) {
+        return null;
+    }
 }

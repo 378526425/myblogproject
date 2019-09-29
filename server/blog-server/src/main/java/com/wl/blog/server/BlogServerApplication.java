@@ -10,7 +10,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.wl.blog.utils","com.wl","com.wl.blog.controller"})
-@ServletComponentScan  //注册过滤器注解
 @EnableCaching
 @EnableEurekaClient
 @EnableRedisHttpSession

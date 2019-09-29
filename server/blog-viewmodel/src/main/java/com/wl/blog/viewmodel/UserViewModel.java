@@ -19,23 +19,41 @@ import java.util.List;
 public class UserViewModel extends User implements Serializable {
     @Size(min = 2, max = 30)
     String truePassword;
-    List<Role> roleList;
-    List<Permission> permissionList;
+    List<RoleViewModel> roleList;
+    List<PermissionViewModel> permissionList;//全部权限
+    List<PermissionViewModel> menuPermissionList;//菜单权限
+    List<PermissionViewModel> btnPermissionList;//按钮权限
 
-    public List<Role> getRoleList() {
+    public List<RoleViewModel> getRoleList() {
         return roleList;
     }
 
-    public void setRoleList(List<Role> roleList) {
+    public void setRoleList(List<RoleViewModel> roleList) {
         this.roleList = roleList;
     }
 
-    public List<Permission> getPermissionList() {
+    public List<PermissionViewModel> getPermissionList() {
         return permissionList;
     }
 
-    public void setPermissionList(List<Permission> permissionList) {
+    public void setPermissionList(List<PermissionViewModel> permissionList) {
         this.permissionList = permissionList;
+    }
+
+    public List<PermissionViewModel> getMenuPermissionList() {
+        return menuPermissionList;
+    }
+
+    public void setMenuPermissionList(List<PermissionViewModel> menuPermissionList) {
+        this.menuPermissionList = menuPermissionList;
+    }
+
+    public List<PermissionViewModel> getBtnPermissionList() {
+        return btnPermissionList;
+    }
+
+    public void setBtnPermissionList(List<PermissionViewModel> btnPermissionList) {
+        this.btnPermissionList = btnPermissionList;
     }
 
     public String getTruePassword() {

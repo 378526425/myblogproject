@@ -4,9 +4,7 @@ import com.wl.blog.service.UserService;
 import com.wl.blog.utils.BlogUtil;
 import com.wl.blog.viewmodel.UserViewModel;
 import com.wl.common.exception.JrsfException;
-import com.wl.common.utils.JWTUtils;
 import com.wl.common.utils.JrsfReturn;
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,9 +12,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2019-07-22 18:19
  **/
 @RestController
+@RequestMapping("/api")
 public class UserController {
     @Value("${server.port}")
     String port;
@@ -34,7 +30,7 @@ public class UserController {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public JrsfReturn register(@RequestBody @Validated UserViewModel userViewModel) {
         if (StringUtils.isEmpty(userViewModel.getUserName())) {
             return JrsfReturn.error("没有用户名！");
@@ -51,7 +47,7 @@ public class UserController {
         return this.userService.register(userViewModel);
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public JrsfReturn login(@RequestBody @Validated UserViewModel userViewModel) {
 
         if (StringUtils.isEmpty(userViewModel.getLoginNumber())) {
@@ -64,17 +60,17 @@ public class UserController {
         return this.userService.login(userViewModel);
     }
 
-    @GetMapping("sso")
+    @GetMapping("/sso")
     public JrsfReturn sso() {
         return JrsfReturn.okData(BlogUtil.getLoginUser());
     }
 
-    @GetMapping("loginOut")
+    @GetMapping("/loginOut")
     public JrsfReturn loginOut(HttpServletRequest request) {
         String token=request.getHeader("Authorization");
         if (token!=null)
         {
-            redisTemplate.expire(token,1, TimeUnit.MILLISECONDS);
+            redisTemplate.delete(token);
         }else
         {
             throw new  JrsfException("未登录！");

@@ -4,9 +4,8 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
-import com.wl.blog.server.entity.Article;
+import com.wl.blog.server.entity.CommentMessage;
 
 import javax.annotation.Generated;
 
@@ -14,16 +13,18 @@ import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
 
 /**
- * QArticle is a Querydsl query type for Article
+ * QCommentMessage is a Querydsl query type for CommentMessage
  */
 @Generated("com.querydsl.codegen.EntitySerializer")
-public class QArticle extends EntityPathBase<Article> {
+public class QCommentMessage extends EntityPathBase<CommentMessage> {
 
-    private static final long serialVersionUID = 292628886L;
+    private static final long serialVersionUID = 1693040648L;
 
-    public static final QArticle article = new QArticle("article");
+    public static final QCommentMessage commentMessage = new QCommentMessage("commentMessage");
 
     public final com.wl.common.entity.QBaseObject _super = new com.wl.common.entity.QBaseObject(this);
+
+    public final StringPath commentId = createString("commentId");
 
     public final StringPath content = createString("content");
 
@@ -33,16 +34,8 @@ public class QArticle extends EntityPathBase<Article> {
     //inherited
     public final StringPath creator = _super.creator;
 
-    public final NumberPath<Long> dislikeCount = createNumber("dislikeCount", Long.class);
-
     //inherited
     public final StringPath id = _super.id;
-
-    public final StringPath img = createString("img");
-
-    public final StringPath introduction = createString("introduction");
-
-    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
 
     //inherited
     public final DateTimePath<java.util.Date> modifiedTime = _super.modifiedTime;
@@ -50,22 +43,20 @@ public class QArticle extends EntityPathBase<Article> {
     //inherited
     public final StringPath modifier = _super.modifier;
 
-    public final NumberPath<Long> readCount = createNumber("readCount", Long.class);
-
-    public final StringPath title = createString("title");
+    public final StringPath toUserId = createString("toUserId");
 
     public final StringPath userId = createString("userId");
 
-    public QArticle(String variable) {
-        super(Article.class, forVariable(variable));
+    public QCommentMessage(String variable) {
+        super(CommentMessage.class, forVariable(variable));
     }
 
-    public QArticle(Path<? extends Article> path) {
+    public QCommentMessage(Path<? extends CommentMessage> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QArticle(PathMetadata metadata) {
-        super(Article.class, metadata);
+    public QCommentMessage(PathMetadata metadata) {
+        super(CommentMessage.class, metadata);
     }
 
 }

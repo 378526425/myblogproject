@@ -12,6 +12,7 @@ import com.wl.blog.viewmodel.ArticleViewModel;
 import com.wl.blog.viewmodel.UserViewModel;
 import com.wl.common.dao.BaseDao;
 import com.wl.common.entity.ResultSet;
+import com.wl.common.exception.JrsfException;
 import com.wl.common.utils.FileUtil;
 import com.wl.common.utils.JrsfReturn;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +22,6 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +39,10 @@ public class ArticleService {
 
     @Transactional
     public JrsfReturn addArticle(ArticleViewModel articleViewModel) {
+        if (BlogUtil.getLoginUser()==null)
+        {
+            throw new JrsfException("未登录");
+        }
         Article article = new Article();
         BeanUtils.copyProperties(articleViewModel, article);
 
@@ -49,37 +53,49 @@ public class ArticleService {
     }
 
 
-
     @Transactional
     public JrsfReturn deleteArticle(String id) {
 
-        Article article=getArticleById(id);
+        Article article = getArticleById(id);
+        checkPower(article);
         FileUtil.deleteFileOrDire(BlogUtil.fileAbsolutePath(article.getImg()));
         this.baseDao.delete(article);
         return JrsfReturn.okMsg("已删除！");
     }
 
+    private void checkPower(Article article) {
+        if (BlogUtil.getLoginUser()==null)
+        {
+            throw new JrsfException("未登录");
+        }
+        if (BlogUtil.getLoginUser().getRoleList().get(0).getRoleGrade()>0&&!BlogUtil.getLoginUser().getId().equals(article.getUserId()))
+        {
+            throw new JrsfException("权限不足！");
+        }
+    }
+
     @Transactional
     public JrsfReturn updateArticle(ArticleViewModel articleViewModel) {
         Article article = getArticleById(articleViewModel.getId());
-        if (StringUtils.isEmpty(articleViewModel.getBase64()))
-        {
-           articleViewModel.setImg(article.getImg());
-        }else
-        {
+        checkPower(article);
+        if (StringUtils.isEmpty(articleViewModel.getBase64())) {
+            articleViewModel.setImg(article.getImg());
+        } else {
             FileUtil.deleteFileOrDire(BlogUtil.fileAbsolutePath(article.getImg()));
             articleViewModel.setImg(upLoadimg(articleViewModel));
         }
         articleViewModel.setUserId(article.getUserId());
         articleViewModel.setCreatedTime(article.getCreatedTime());
-        articleViewModel.setModifiedTime(new Date());
         BeanUtils.copyProperties(articleViewModel, article);
         this.baseDao.update(article);
         return JrsfReturn.okData(article);
     }
 
+    @Transactional
     public JrsfReturn getArticle(String id) {
         Article article = getArticleById(id);
+        article.setReadCount(article.getReadCount() + 1);
+        this.baseDao.update(article);
         return JrsfReturn.okData(article);
     }
 
@@ -111,21 +127,41 @@ public class ArticleService {
         }
         ResultSet<ArticleViewModel> resultSet = new ResultSet<>();
         resultSet.setTotal(jpaQuery.fetchCount());
-        List<ArticleViewModel> articleViewModels=jpaQuery.fetch();
+        List<ArticleViewModel> articleViewModels = jpaQuery.fetch();
         resultSet.setRows(articleViewModels);
         return JrsfReturn.okData(resultSet);
     }
-    private  Article getArticleById(String id)
-    {
+
+    private Article getArticleById(String id) {
         QArticle qArticle = QArticle.article;
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(this.baseDao.getEntityManager());
-        Article article=jpaQueryFactory.selectFrom(qArticle).where(qArticle.id.eq(id)).fetchFirst();
+        Article article = jpaQueryFactory.selectFrom(qArticle).where(qArticle.id.eq(id)).fetchFirst();
         return article;
     }
+
     private String upLoadimg(ArticleViewModel articleViewModel) {
-        String imgName=articleViewModel.getImgName();
-        String imgPath = "articleimg" + File.separator + UUID.randomUUID().toString().replace("-","") + imgName;
-        FileUtil.base64ToFile(articleViewModel.getBase64(),BlogUtil.fileAbsolutePath(imgPath));
+        String imgName = articleViewModel.getImgName();
+        String imgPath = "articleimg" + File.separator + UUID.randomUUID().toString().replace("-", "") + imgName;
+        FileUtil.base64ToFile(articleViewModel.getBase64(), BlogUtil.fileAbsolutePath(imgPath));
         return imgPath;
     }
+
+    @Transactional
+    public JrsfReturn likeArticle(String id) {
+        Article article = getArticleById(id);
+        long likeCount = article.getLikeCount();
+        article.setLikeCount(likeCount + 1);
+        this.baseDao.update(article);
+        return JrsfReturn.ok();
+    }
+
+    @Transactional
+    public JrsfReturn dislikeArticle(String id) {
+        Article article = getArticleById(id);
+        long dislikeCount = article.getDislikeCount();
+        article.setDislikeCount(dislikeCount + 1);
+        this.baseDao.update(article);
+        return JrsfReturn.ok();
+    }
+
 }

@@ -21,6 +21,14 @@ public class Permission extends BaseObject {
     String requestType;
     String parentId;
 
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
     public String getResources() {
         return resources;
     }

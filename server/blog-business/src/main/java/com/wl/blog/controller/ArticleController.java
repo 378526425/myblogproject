@@ -29,10 +29,12 @@ public class ArticleController {
 
         return this.articleService.deleteArticle(id);
     }
+
     @PutMapping("/Article")
     public JrsfReturn updateArticle(@RequestBody @Validated ArticleViewModel articleViewModel) {
         return this.articleService.updateArticle(articleViewModel);
     }
+
     @GetMapping("/Article/{id}")
     public JrsfReturn getArticle(@PathVariable String id) {
         return this.articleService.getArticle(id);
@@ -41,5 +43,14 @@ public class ArticleController {
     @GetMapping("/Article")
     public JrsfReturn getPageArticle(@RequestParam(required = false, defaultValue = "") String condition, @RequestParam(defaultValue = "1", required = false) int pageIndex, @RequestParam(defaultValue = "10", required = false) int pageSize) {
         return this.articleService.getArticle(condition, pageIndex, pageSize);
+    }
+
+    @GetMapping("/Article/likeArticle/{id}")
+    public JrsfReturn likeArticle(@PathVariable String id) {
+        return this.articleService.likeArticle(id);
+    }
+    @GetMapping("/Article/disLikeArticle/{id}")
+    public JrsfReturn disLikeArticle(@PathVariable String id) {
+        return this.articleService.dislikeArticle(id);
     }
 }

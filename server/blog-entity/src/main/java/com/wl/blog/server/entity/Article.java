@@ -23,7 +23,33 @@ public class Article extends BaseObject {
     String content;//文章内容
     String img;//封面图 片
     String userId;
+    long likeCount;//对我有用总数,赞同
+    long dislikeCount;//对我无用总数,赞同
+    long  readCount;//阅读总数
 
+    public long getDislikeCount() {
+        return dislikeCount;
+    }
+
+    public void setDislikeCount(long dislikeCount) {
+        this.dislikeCount = dislikeCount;
+    }
+
+    public long getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public long getReadCount() {
+        return readCount;
+    }
+
+    public void setReadCount(long readCount) {
+        this.readCount = readCount;
+    }
     public String getTitle() {
         return title;
     }

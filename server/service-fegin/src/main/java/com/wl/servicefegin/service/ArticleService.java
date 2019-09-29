@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "service-blog",fallback = ArticleFeignFallBack.class,configuration = FeignHystrixConcurrencyStrategy.class)
 @Component
 public interface ArticleService {
-    @PostMapping("/Article")
+    @PostMapping("/api/Article")
     JrsfReturn addArticle(@RequestBody @Validated ArticleViewModel articleViewModel);
     @DeleteMapping("/api/Article/{id}")
      JrsfReturn deleteArticle(@PathVariable String id) ;
@@ -28,4 +28,9 @@ public interface ArticleService {
      JrsfReturn getArticle(@PathVariable String id);
     @GetMapping("/api/Article")
     JrsfReturn getPageArticle(@RequestParam(required = false, defaultValue = "") String condition, @RequestParam(defaultValue = "1", required = false) int pageIndex, @RequestParam(defaultValue = "10", required = false) int pageSize);
+    @GetMapping("/api/Article/likeArticle/{id}")
+    JrsfReturn likeArticle(@PathVariable String id);
+
+    @GetMapping("/api/Article/disLikeArticle/{id}")
+    JrsfReturn disLikeArticle(@PathVariable String id);
 }

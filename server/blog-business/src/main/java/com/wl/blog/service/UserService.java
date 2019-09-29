@@ -4,11 +4,7 @@ import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.wl.blog.server.entity.Permission;
-import com.wl.blog.server.entity.Role;
-import com.wl.blog.server.entity.User;
-import com.wl.blog.server.entity.UserToRole;
-import com.wl.blog.server.entity.querydsl.*;
+import com.wl.blog.server.entity.*;
 import com.wl.blog.viewmodel.PermissionViewModel;
 import com.wl.blog.viewmodel.RoleViewModel;
 import com.wl.blog.viewmodel.UserViewModel;
@@ -20,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -65,7 +63,7 @@ public class UserService {
         this.dao.save(userToRole);
         return JrsfReturn.okData(user);
     }
-
+    @Transactional
     public JrsfReturn login(UserViewModel userViewModel) {
         QUser qUser = QUser.user;
         QRole qRole = QRole.role;
@@ -93,6 +91,7 @@ public class UserService {
                                 qUser.id,
                                 qUser.userName,
                                 qUser.portrait,
+                                qUser.loginNumber,
                                 GroupBy.list(Projections.bean(RoleViewModel.class
                                         , qRole.id
                                         , qRole.roleGrade
@@ -102,19 +101,46 @@ public class UserService {
                                         qPermission.id,
                                         qPermission.api,
                                         qPermission.icon,
-                                        qPermission.permissionName
+                                        qPermission.permissionName,
+                                        qPermission.permissionType
                                 )).as("permissionList")
 
                         )
                 ));
 
         UserViewModel userInfo = map.get(user.getId());
-        List<Role> roles = userInfo.getRoleList().stream().distinct().collect(Collectors.toList());
-        List<Permission> permissions = userInfo.getPermissionList().stream().distinct().collect(Collectors.toList());
-        userInfo.setRoleList(roles);
-        userInfo.setPermissionList(permissions);
+        List<RoleViewModel> roles = userInfo.getRoleList().stream().distinct().collect(Collectors.toList());
+        List<PermissionViewModel> permissions = userInfo.getPermissionList().stream().distinct().collect(Collectors.toList());
+        userViewModel.setRoleList(roles);
+        userViewModel.setPermissionList(permissions);
+        userViewModel.setMenuPermissionList(permissions.stream().filter(o -> o.getPermissionType().equals("menu")).collect(Collectors.toList()));
+        userViewModel.setBtnPermissionList(permissions.stream().filter(o -> o.getPermissionType().equals("btn")).collect(Collectors.toList()));
         String uuid= UUID.randomUUID().toString().replace("-","");
         redisTemplate.opsForValue().set(uuid,userInfo,5, TimeUnit.MINUTES);//存入用户到数据库，有效期为一分钟
-        return JrsfReturn.okMsg(uuid);
+        setLoginStatus(userInfo);
+        return JrsfReturn.okData(uuid);
+    }
+    /**
+     * @Description: 设置登录状态
+     * @Param:
+     * @return:
+     * @Author: Mr.Wang
+     * @Date: 2019/8/27
+     */
+
+    private void setLoginStatus(UserViewModel userViewModel) {
+
+        //添加sessionid 用户id,操作时先查询有没有该session存在，否则就把他挤下去
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        String sessionId = request.getSession().getId();
+        LoginStatus loginStatus = new LoginStatus();
+        loginStatus.setSessionId(sessionId);
+        loginStatus.setUserName(userViewModel.getLoginNumber());
+        loginStatus.setId(UUID.randomUUID().toString());
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(this.dao.getEntityManager());
+        QLoginStatus qLoginStatus = QLoginStatus.loginStatus;
+        jpaQueryFactory.delete(qLoginStatus).where(qLoginStatus.userName.eq(userViewModel.getLoginNumber())).execute();
+        this.dao.save(loginStatus);
     }
 }

@@ -29,6 +29,8 @@ public class QArticle extends EntityPathBase<Article> {
     //inherited
     public final StringPath creator = _super.creator;
 
+    public final NumberPath<Long> dislikeCount = createNumber("dislikeCount", Long.class);
+
     //inherited
     public final StringPath id = _super.id;
 
@@ -36,11 +38,15 @@ public class QArticle extends EntityPathBase<Article> {
 
     public final StringPath introduction = createString("introduction");
 
+    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
+
     //inherited
     public final DateTimePath<java.util.Date> modifiedTime = _super.modifiedTime;
 
     //inherited
     public final StringPath modifier = _super.modifier;
+
+    public final NumberPath<Long> readCount = createNumber("readCount", Long.class);
 
     public final StringPath title = createString("title");
 

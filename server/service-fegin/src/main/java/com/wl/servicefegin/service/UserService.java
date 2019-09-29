@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "service-blog",fallback = UserFeignFallBack.class,configuration = FeignHystrixConcurrencyStrategy.class)
 @Component
 public interface UserService {
-    @PostMapping("register")
+    @PostMapping("/api/register")
      JrsfReturn register(@RequestBody @Validated UserViewModel userViewModel) ;
-    @PostMapping("login")
+    @PostMapping("/api/login")
      JrsfReturn login(@RequestBody @Validated UserViewModel userViewModel);
-    @GetMapping("sso")
+    @GetMapping("/api/sso")
     JrsfReturn sso();
-    @GetMapping("loginOut")
+    @GetMapping("/api/loginOut")
     JrsfReturn loginOut();
 
 }

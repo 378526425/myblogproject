@@ -42,4 +42,12 @@ public class ArticleController {
     {
         return this.articleService.getPageArticle(condition,pageIndex,pageSize);
     }
+    @GetMapping("/Article/likeArticle/{id}")
+    public JrsfReturn likeArticle(@PathVariable String id) {
+        return this.articleService.likeArticle(id);
+    }
+    @GetMapping("/Article/disLikeArticle/{id}")
+    public JrsfReturn disLikeArticle(@PathVariable String id) {
+        return this.articleService.disLikeArticle(id);
+    }
 }

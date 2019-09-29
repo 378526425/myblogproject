@@ -1,21 +1,30 @@
 package com.wl.blog.Interceptor;
 
-import com.alibaba.fastjson.JSON;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
-import com.wl.blog.server.entity.Article;
-import com.wl.blog.server.entity.querydsl.QArticle;
+import com.wl.blog.server.entity.LoginStatus;
+import com.wl.blog.server.entity.querydsl.QIgnoreResource;
+import com.wl.blog.server.entity.querydsl.QLoginStatus;
 import com.wl.blog.utils.BlogUtil;
-import com.wl.common.HttpUtils.RequestWrapper;
+import com.wl.blog.viewmodel.IgnoreResourceViewModel;
+import com.wl.blog.viewmodel.PermissionViewModel;
 import com.wl.common.dao.BaseDao;
-import com.wl.common.entity.BaseObject;
 import com.wl.common.enummodel.AccessType;
 import com.wl.common.utils.EvCommonTool;
 import com.wl.common.utils.JrsfReturn;
+import javafx.application.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,21 +38,9 @@ public class AuthorityInterceptor implements HandlerInterceptor {
     BaseDao baseDao;
     @Autowired
     RedisTemplate redisTemplate;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token=request.getHeader("Authorization");
-        if (token!=null)
-        {
-            long times= redisTemplate.getExpire(token, TimeUnit.SECONDS);//剩余过期时间
-            if (times>0)
-            {
-                redisTemplate.expire(token,5, TimeUnit.MINUTES);//如果还没有过期则续期5分钟
-            }else
-            {
-                redisTemplate.delete(token);
-            }
-        }
-
         String method = request.getMethod();
         String uri = request.getRequestURI();
         if (uri.startsWith("/api/")) {
@@ -51,45 +48,95 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         }
         String resource = uri;
         AccessType aType = getAccessType(method);
-        String id = "";
-        if (AccessType.DELETE.equals(aType)) {
-            id = uri.substring(uri.lastIndexOf("/") + 1);
-        }else if (AccessType.UPDATE.equals(aType))
-        {
-            RequestWrapper requestWrapper = new RequestWrapper(request);
-            String body = requestWrapper.getBody();
-            if (!"".equals(body))
-            {
-                id= JSON.parseObject(body, BaseObject.class).getId();
-            }
-        }
         if (uri.indexOf("/") >= 0) {
             resource = uri.substring(0, uri.indexOf("/"));
         }
-        //文章的添加，修改，删除需要登录才能操作,且用户只能修改和删除自己的文章
-        if (!articleCheck(resource,aType,id,response))
+
+        if (checkIgnore(resource, aType, request))//校验通用不需要拦截的接口
+        {
+            return true;
+        }
+        String token = request.getHeader("Authorization");
+        //验证是否登录
+        if (token != null) {
+            long times = redisTemplate.getExpire(token, TimeUnit.SECONDS);//剩余过期时间
+            if (times > 0) {
+                redisTemplate.expire(token, 5, TimeUnit.MINUTES);//如果还没有过期则续期5分钟
+            } else {
+                redisTemplate.delete(token);
+                EvCommonTool.responseInfo(response, JrsfReturn.error("登录失效！"));
+                return false;
+            }
+        } else {
+            EvCommonTool.responseInfo(response, JrsfReturn.error("未登录！"));
+            return false;
+        }
+
+        if (!checkLoginStatus(response))//验证当前用户是否处于登录状态
+            return false;
+
+        if (!checkPermission(resource, aType))//校验是否有该权限
             return false;
 
         return true;
     }
 
-    private boolean articleCheck(String resource, AccessType aType, String id,HttpServletResponse response) {
-        if ("Article".equals(resource) && (!AccessType.REVIEW.equals(aType) && BlogUtil.getLoginUser() == null)) {
-            EvCommonTool.responseInfo(response, JrsfReturn.error("未登录"));
-            return false;
-        } else if ("Article".equals(resource) && AccessType.UPDATE.equals(aType)||AccessType.DELETE.equals(aType)) {
-            if (BlogUtil.getLoginUser().getRoleList().get(0).getRoleGrade()==0)
-            {
-                return true;//管理员有全部权限
-            }
-            QArticle qArticle=QArticle.article;
-            JPAQuery<Article> jpaQuery=new JPAQuery<>(this.baseDao.getEntityManager());
-            Article article= jpaQuery.select(qArticle).from(qArticle).where(qArticle.id.eq(id)).fetchFirst();
+    private boolean checkIgnore(String resource, AccessType aType, HttpServletRequest request) {
+        ServletContext applicationContext = request.getSession().getServletContext();
+        Object object = applicationContext.getAttribute("ignoreResource");
+        List<PermissionViewModel> permissionViewModelList = new ArrayList<>();
+        if (object != null) {
+            permissionViewModelList = (List<PermissionViewModel>) object;
+        } else {
+            QIgnoreResource qIgnoreResource = QIgnoreResource.ignoreResource;
 
-            if (article!=null&&!BlogUtil.getLoginUser().getId().equals(article.getUserId())) {
-                EvCommonTool.responseInfo(response, JrsfReturn.error("权限不足!无法修改或删除他人的文章！"));
-                return false;
+            JPAQuery<IgnoreResourceViewModel> jpaQuery = new JPAQuery<>(this.baseDao.getEntityManager());
+            List<IgnoreResourceViewModel> ignoreResourceViewModelList= jpaQuery.from(qIgnoreResource).select(
+                    Projections.bean(IgnoreResourceViewModel.class
+                            , qIgnoreResource.resourceName
+                            , qIgnoreResource.aType)
+            ).fetch();
+            for (IgnoreResourceViewModel model :ignoreResourceViewModelList)
+            {
+                PermissionViewModel permissionViewModel=new PermissionViewModel();
+                permissionViewModel.setResources(model.getResourceName());
+                permissionViewModel.setRequestType(model.getaType());
+                permissionViewModelList.add(permissionViewModel);
             }
+            applicationContext.setAttribute("ignoreResource",permissionViewModelList);
+        }
+        return checkPermissionByPermissList(resource,aType,permissionViewModelList);
+    }
+
+    private boolean checkPermission(String resource, AccessType aType) {
+        List<PermissionViewModel> permissionViewModelList = BlogUtil.getLoginUser().getBtnPermissionList();
+        return checkPermissionByPermissList(resource,aType,permissionViewModelList);
+    }
+   private boolean checkPermissionByPermissList(String resource, AccessType aType,List<PermissionViewModel> permissionViewModelList)
+   {
+       for (PermissionViewModel model : permissionViewModelList) {
+           if (model.getResources() != null && model.getRequestType() != null) {
+               String[] resourceNames = model.getResources().split("#");
+               String[] aTypes = model.getRequestType().split("#");
+               for (int i = 0; i < resourceNames.length && i < aTypes.length; i++) {
+                   if (resourceNames[i].equals(resource) && aType.toString().equals(aTypes[i])) {
+                       return true;
+                   }
+               }
+           }
+       }
+       return false;
+   }
+    private boolean checkLoginStatus(HttpServletResponse response) {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        String sessionId = request.getSession().getId();
+        QLoginStatus qLoginStatus = QLoginStatus.loginStatus;
+        JPAQuery<LoginStatus> jpaQuery = new JPAQuery<>(this.baseDao.getEntityManager());
+        long userSession = jpaQuery.select(qLoginStatus).from(qLoginStatus).where(qLoginStatus.sessionId.eq(sessionId).and(qLoginStatus.userName.eq(BlogUtil.getLoginUser().getLoginNumber()))).fetchCount();
+        if (userSession == 0) {
+            EvCommonTool.responseInfo(response, JrsfReturn.error("在其他地方已登录！"));
+            return false;//当前用户已被挤下线
         }
         return true;
     }
